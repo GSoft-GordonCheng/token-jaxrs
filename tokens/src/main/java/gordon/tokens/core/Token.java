@@ -7,6 +7,8 @@ import java.util.Base64;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import gordon.tokens.WebApplication;
+
 /**
 * @author Gordon
 */
@@ -28,9 +30,6 @@ public abstract class Token {
 		this.token = createToken();
 		return this.token;
 	}
-	public void save() {
-		getKeyValue();
-	}
 	public SecretKey getKey() throws NoSuchAlgorithmException {
 		if (null == this.key) {
 			throw new NoSuchAlgorithmException();
@@ -49,11 +48,15 @@ public abstract class Token {
 		return keyGen.generateKey();
 	}
 	public static String findByToken(String token) {
-		return "nTv4MY+RnXk=";
+		return WebApplication.jedis.get(token);
 	}
 	public static void deleteByToken(String token) {
-		
+		WebApplication.jedis.del(token);
 	}
 	public abstract String createToken() throws NoSuchAlgorithmException;
 	public abstract void getKeyValue();
+	public void save(String key, String value) {
+		int seconds = 24 * 60 * 60;
+		WebApplication.jedis.setex(key, seconds, value);
+	}
 }

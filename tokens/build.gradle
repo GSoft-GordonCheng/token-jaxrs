@@ -26,5 +26,9 @@ dependencies {
 
 	//compile 'com.auth0:java-jwt:3.2.0'
 	compile 'io.jsonwebtoken:jjwt:0.7.0'
+	
+	// https://mvnrepository.com/artifact/redis.clients/jedis
+	compile group: 'redis.clients', name: 'jedis', version: '2.9.0'	
+	
 }
 

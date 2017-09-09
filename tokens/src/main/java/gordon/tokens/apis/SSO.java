@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 
 import gordon.LDAP.LDAP;
 import gordon.LDAP.ADUser;
@@ -35,7 +36,7 @@ public class SSO {
 	public VerifyDTO verify(
 			@DefaultValue("") @PathParam("token") String token
 	) {
-		/*
+		/*	@Encoded
 		{
 		    "key": "nTv4MY+RnXk=",
 		    "token": "U1v5jJmBP08="
@@ -46,10 +47,11 @@ public class SSO {
 		// 3. 延長令牌時效.AND.更新
 		
 		*/
-		String key = Token.findByToken(token);
-		if (key.length() > 0) {
+		System.out.println(token);
+		String value = Token.findByToken(token);
+		if (null != value && value.length() > 0) {
 			try {
-				String owner = XToken.decode(token, key);
+				String owner = XToken.decode(token, value);
 				VerifyDTO dto = new VerifyDTO(owner);
 				return dto;
 			} catch (Exception e) {
@@ -72,16 +74,15 @@ public class SSO {
 			Token token = new XToken(user.getId());
 			// 產生令牌
 			try {
-				String tokenString = token.generate();
-				String keyString = token.getKeyString();
-
-				System.out.println(tokenString);
-				System.out.println(keyString);
+				String key = token.generate();
+				String value = token.getKeyString();
+				//System.out.println(tokenString);
+				//System.out.println(keyString);
 				//System.out.println(XToken.decode(tokenString, "999"));
 				// 回存令牌
-				// token.save();
+				token.save(key, value);
 				// 返回令牌
-				return new TokenDTO(tokenString, keyString);	
+				return new TokenDTO(key, value);	
 			} catch (Exception e ) {
 				e.printStackTrace();
 				/*
@@ -102,7 +103,7 @@ public class SSO {
 	@DELETE
 	@Path("/{token}")
 	public Response logout(
-		@DefaultValue("") @PathParam("token") String token
+		@DefaultValue("") @Encoded @PathParam("token") String token
 	) {
 		// 登出/撤銷令牌	
 		try {

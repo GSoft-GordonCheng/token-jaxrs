@@ -30,10 +30,6 @@ public class JWTToken extends Token {
                 .signWith(SignatureAlgorithm.HS512, key)
                 .compact();
 	}
-	@Override
-	public void save() {
-		// TODO Auto-generated method stub
-	}
 	private Date toDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }

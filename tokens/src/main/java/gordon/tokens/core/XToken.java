@@ -29,10 +29,6 @@ public class XToken extends Token {
 		}
 	}
 	@Override
-	public void save() {
-		// TODO Auto-generated method stub
-	}
-	@Override
 	public void getKeyValue() {
 		// TODO Auto-generated method stub
 		

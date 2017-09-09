@@ -19,9 +19,7 @@
 		<servlet-name>Jersey REST Service</servlet-name>
 		<url-pattern>/*</url-pattern> <!-- api路徑 -->
 	</servlet-mapping>
-<!-- 監聽類別
 	<listener>
-		<listener-class>wesley.com.helloworld.ServerContext</listener-class>	
+		<listener-class>gordon.tokens.WebApplication</listener-class>	
 	</listener>
--->
 </web-app>
