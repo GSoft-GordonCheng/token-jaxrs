@@ -22,8 +22,10 @@ import gordon.tokens.dto.ErrorItemDTO;
 import gordon.tokens.dto.LoginDTO;
 import gordon.tokens.dto.TokenDTO;
 import gordon.tokens.dto.VerifyDTO;
+import gordon.tokens.exceptions.InternalJedisError;
 import gordon.tokens.exceptions.InternalServerErrorException;
 import gordon.tokens.exceptions.NotAuthorizedException;
+import redis.clients.jedis.exceptions.JedisDataException;
 
 /**
 * @author Gordon
@@ -45,20 +47,29 @@ public class SSO {
 		// 1. 驗證令牌(取得密鑰)
 		// 2. 反解令牌
 		// 3. 延長令牌時效.AND.更新
-		
 		*/
-		System.out.println(token);
-		String value = Token.findByToken(token);
-		if (null != value && value.length() > 0) {
-			try {
+		// System.out.println(token);
+		VerifyDTO dto = null;
+		try
+		{
+			String value = Token.findByToken(token);
+			if (null != value && value.length() > 0) {
 				String owner = XToken.decode(token, value);
-				VerifyDTO dto = new VerifyDTO(owner);
-				return dto;
-			} catch (Exception e) {
-				e.printStackTrace();
+				dto = new VerifyDTO(owner);
+				//
+				// 自動延期
+				//
 			}
+		} catch (JedisDataException e) {
+			throw new InternalJedisError();			
+		} catch (Exception e) {
+			throw new InternalServerErrorException();
 		}
-		throw new NotAuthorizedException();
+		if (null != dto) {
+			return dto;
+		} else {
+			throw new NotAuthorizedException();			
+		}
 	}
 	
 	@POST
@@ -67,37 +78,34 @@ public class SSO {
 	public TokenDTO login(
 			LoginDTO user
 	) {
-		// 登入
-		ADUser usr = LDAP.login(user.getId(), user.getPwd());
-		if (null != usr) {
-			//Token token = new JWTToken(user.getId());
-			Token token = new XToken(user.getId());
-			// 產生令牌
-			try {
+		TokenDTO dto = null;
+		try {
+			// 登入
+			ADUser usr = LDAP.login(user.getId(), user.getPwd());
+			if (null != usr) {
+				// 產生令牌
+				Token token = new XToken(user.getId()); // new JWTToken(user.getId());
+				// 私鑰
 				String key = token.generate();
+				// 令牌
 				String value = token.getKeyString();
-				//System.out.println(tokenString);
-				//System.out.println(keyString);
-				//System.out.println(XToken.decode(tokenString, "999"));
-				// 回存令牌
+				// 回存私鑰+令牌
 				token.save(key, value);
-				// 返回令牌
-				return new TokenDTO(key, value);	
-			} catch (Exception e ) {
-				e.printStackTrace();
-				/*
-				 * 測試錯誤碼DTO約定格式
-				 */
-				ErrorListDTO dto = new ErrorListDTO();
-				ErrorItemDTO e1 = new ErrorItemDTO("CE8888", "create token error");
-				ErrorFieldDTO e2 = new ErrorFieldDTO("CE5555", "create token error", "title");
-				dto.add(e1);
-				dto.add(e2);
-				
-				throw new InternalServerErrorException(dto);
+				// 
+				dto = new TokenDTO(key, value);	
 			}
+		} catch (JedisDataException e) {
+			e.printStackTrace(); // write to log file
+			throw new InternalJedisError();
+		} catch (Exception e ) {
+			e.printStackTrace(); // write to log file
+			throw new InternalServerErrorException();
 		}
-		throw new NotAuthorizedException();
+		if (null != dto) {
+			return dto;
+		} else {
+			throw new NotAuthorizedException();			
+		}		
 	}	
 	
 	@DELETE
@@ -108,8 +116,11 @@ public class SSO {
 		// 登出/撤銷令牌	
 		try {
 			Token.deleteByToken(token);
-		}catch (Exception e) {
+		} catch (JedisDataException e) {
+			throw new InternalJedisError();
+		} catch (Exception e) {
 			e.printStackTrace();
+			throw new InternalServerErrorException();
 		}
 		return Response.noContent().build();
 	}

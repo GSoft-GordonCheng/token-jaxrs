@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 
 import gordon.tokens.dto.ErrorListDTO;
+import gordon.tokens.dto.ErrorFieldDTO;
 import gordon.tokens.dto.ErrorItemDTO;
 
 /**
@@ -29,4 +30,13 @@ public class InternalServerErrorException extends WebApplicationException {
                 .entity(new Gson().toJson(dto)).encoding("UTF-8")
                 .build());		
 	}
+	
+	/*
+	 * 測試錯誤碼DTO約定格式
+	ErrorListDTO dto = new ErrorListDTO();
+	ErrorItemDTO e1 = new ErrorItemDTO("CE8888", "create token error");
+	ErrorFieldDTO e2 = new ErrorFieldDTO("CE5555", "create token error", "title");
+	dto.add(e1);
+	dto.add(e2);
+	 */	
 }

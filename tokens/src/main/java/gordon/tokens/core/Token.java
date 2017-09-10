@@ -8,6 +8,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import gordon.tokens.WebApplication;
+import redis.clients.jedis.exceptions.JedisDataException;
 
 /**
 * @author Gordon
@@ -57,6 +58,10 @@ public abstract class Token {
 	public abstract void getKeyValue();
 	public void save(String key, String value) {
 		int seconds = 24 * 60 * 60;
-		WebApplication.jedis.setex(key, seconds, value);
+		String status = WebApplication.jedis.setex(key, seconds, value);
+		if (!"OK".equals(status)) {
+			System.out.println(status);
+			throw new JedisDataException("setex:"+status);
+		}
 	}
 }
