@@ -3,10 +3,15 @@ package gordon.tokens.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.google.gson.Gson;
+
 /**
 * @author Gordon
 */
-public class ErrorListDTO extends ArrayList<ErrorItemDTO>  implements Serializable{
+public class ErrorListDTO extends ArrayList<ErrorDTO>  implements Serializable{
 
 	/**
 	 * 
@@ -15,8 +20,8 @@ public class ErrorListDTO extends ArrayList<ErrorItemDTO>  implements Serializab
 	public ErrorListDTO() {
 		super();
 	}
-	public ErrorListDTO(ErrorItemDTO item) {
+	public ErrorListDTO(ErrorDTO item) {
 		this.add(item);
 	}
-
+	
 }

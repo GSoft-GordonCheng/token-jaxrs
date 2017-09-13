@@ -14,11 +14,9 @@ import javax.ws.rs.Encoded;
 
 import gordon.LDAP.LDAP;
 import gordon.LDAP.ADUser;
+import gordon.tokens.core.JWTToken;
 import gordon.tokens.core.Token;
 import gordon.tokens.core.XToken;
-import gordon.tokens.dto.ErrorListDTO;
-import gordon.tokens.dto.ErrorFieldDTO;
-import gordon.tokens.dto.ErrorItemDTO;
 import gordon.tokens.dto.LoginDTO;
 import gordon.tokens.dto.TokenDTO;
 import gordon.tokens.dto.VerifyDTO;
@@ -38,11 +36,7 @@ public class SSO {
 	public VerifyDTO verify(
 			@DefaultValue("") @PathParam("token") String token
 	) {
-		/*	@Encoded
-		{
-		    "key": "nTv4MY+RnXk=",
-		    "token": "U1v5jJmBP08="
-		}
+		/*	PathParam 參數若有特殊符號, 要做 urlencode.
 		// 反查
 		// 1. 驗證令牌(取得密鑰)
 		// 2. 反解令牌
@@ -84,15 +78,16 @@ public class SSO {
 			ADUser usr = LDAP.login(user.getId(), user.getPwd());
 			if (null != usr) {
 				// 產生令牌
-				Token token = new XToken(user.getId()); // new JWTToken(user.getId());
-				// 私鑰
-				String key = token.generate();
+				Token token = new XToken(user.getId());
+				// Token token = new JWTToken(user.getId());
 				// 令牌
-				String value = token.getKeyString();
+				String tokenKey = token.generate();
+				// 私鑰
+				String privateKey = token.getKeyString();
 				// 回存私鑰+令牌
-				token.save(key, value);
+				token.save(tokenKey, privateKey);
 				// 
-				dto = new TokenDTO(key, value);	
+				dto = new TokenDTO(tokenKey);	
 			}
 		} catch (JedisDataException e) {
 			e.printStackTrace(); // write to log file
@@ -124,4 +119,5 @@ public class SSO {
 		}
 		return Response.noContent().build();
 	}
+
 }

@@ -23,3 +23,7 @@
 		<listener-class>gordon.tokens.WebApplication</listener-class>	
 	</listener>
 </web-app>
+<!-- 
+tomcat server (conf/catalina.properties)
+org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH: true
+-->

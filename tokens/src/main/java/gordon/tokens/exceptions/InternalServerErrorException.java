@@ -9,8 +9,7 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 
 import gordon.tokens.dto.ErrorListDTO;
-import gordon.tokens.dto.ErrorFieldDTO;
-import gordon.tokens.dto.ErrorItemDTO;
+import gordon.tokens.dto.ErrorDTO;
 
 /**
 * @author Gordon
@@ -22,7 +21,7 @@ public class InternalServerErrorException extends WebApplicationException {
 	private static final long serialVersionUID = 1L;
 	
 	public InternalServerErrorException(){
-		this(new ErrorListDTO(new ErrorItemDTO("SE9999", "unknown")));
+		this(new ErrorListDTO(new ErrorDTO("SE9999", "unknown")));
 	}
 	public InternalServerErrorException(ErrorListDTO dto){
 		super(Response.status(INTERNAL_SERVER_ERROR)
