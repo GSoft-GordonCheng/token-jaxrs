@@ -9,7 +9,7 @@ import java.util.Properties;
 * @author Gordon
 */
 public class JobProperties implements IInitialized {
-	private final String FONFIG_NAME = "config.properties";
+	private final String FONFIG_NAME = "/res/config.properties";
 	private Properties properties = new Properties();
 	
 	@Override
